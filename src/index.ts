@@ -70,7 +70,7 @@ export function registerHotkey(
         .join("+"));
 
     return listen(target, eventName, function (this: EventTarget, e: KeyboardEvent) {
-        if ((e.target as HTMLElement)?.hasAttribute("data-hotkey-ignore")) {
+        if ((e.target as HTMLElement)?.closest("[data-hotkey-ignore]")) {
             return;
         }
 
