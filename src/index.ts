@@ -1,0 +1,123 @@
+const aliases: Record<string, string> = {
+    "esc": "escape",
+    "ins": "insert",
+    "del": "delete",
+    "up": "arrowup",
+    "down": "arrowdown",
+    "right": "arrowright",
+    "left": "arrowleft",
+    "pgup": "pageup",
+    "pgdn": "pagedown",
+    "break": "pause",
+    "scroll": "scrolllock",
+    "scrlk": "scrolllock",
+    "prtscr": "printscreen",
+    "win": "meta",
+    "windows": "meta",
+    "cmd": "meta",
+    "command": "meta",
+    "comma": ",",
+    "period": ".",
+    "quote": "\"",
+    "singlequote": "'",
+    "colon": ":",
+    "semicolon": ";",
+    "plus": "+",
+    "minus": "-",
+    "tilde": "~",
+    "equal": "=",
+    "slash": "/"
+};
+
+const controlKeys: string[] = [
+    "ctrlKey",
+    "altKey",
+    "shiftKey",
+    "metaKey"
+];
+
+interface Hotkey {
+    code: string;
+    ctrlKey: boolean;
+    altKey: boolean;
+    shiftKey: boolean;
+    metaKey: boolean;
+}
+
+/**
+ * Registers a hotkey on the specified target element.
+ *
+ * @param {EventTarget} target - The target element on which the hotkey will be registered.
+ * @param {string} hotkey - The combination of keys for the hotkey, e.g., "Ctrl+Alt+Delete".
+ * @param {(e: KeyboardEvent) => void} handler - The function to be called when the hotkey is triggered.
+ * @param {string} [eventName="keydown"] - The name of the event to listen for (default is "keydown").
+ * @param {AddEventListenerOptions | boolean | undefined} [options] - Additional options for the event listener.
+ *
+ * @returns {() => void} - A function to unregister the hotkey.
+ */
+export function registerHotkey(
+    target: EventTarget,
+    hotkey: string,
+    handler: (e: KeyboardEvent) => void,
+    eventName: string = "keydown",
+    options?: AddEventListenerOptions | boolean | undefined): () => void {
+
+    const info = describe(hotkey
+        .replace(/\s+/g, "")
+        .toLowerCase()
+        .split("+")
+        .sort()
+        .join("+"));
+
+    return listen(target, eventName, function (this: EventTarget, e: KeyboardEvent) {
+        if ((e.target as HTMLElement)?.hasAttribute("data-hotkey-ignore")) {
+            return;
+        }
+
+        const code = e.code.toUpperCase();
+
+        if (info.code === code && controlKeys.every(n => info[n as keyof Hotkey] === e[n as keyof KeyboardEvent])) {
+            handler.call(this, e);
+        }
+    } as EventListener, options);
+}
+
+function describe(hotkey: string): Hotkey {
+    const info = hotkey.split("+").reduce((data, k) => {
+        k = aliases[k] ?? k;
+        switch (k) {
+            case "ctrl":
+            case "alt":
+            case "shift":
+            case "meta":
+                data[`${k}Key`] = true;
+                break;
+
+            default:
+                k.length || invalidKey(hotkey);
+                k = k.toUpperCase();
+
+                data.code = k.length === 1 && k >= 'A' && k <= 'Z' ? `KEY${k}` : k;
+                break;
+        }
+        return data;
+    }, {
+        code: "",
+        ctrlKey: false,
+        altKey: false,
+        shiftKey: false,
+        metaKey: false
+    });
+
+    info.code || invalidKey(hotkey);
+    return info;
+}
+
+function listen(target: EventTarget, type: string, callback: EventListener | null, options?: AddEventListenerOptions | boolean | undefined): () => void {
+    target.addEventListener(type, callback, options);
+    return () => target.removeEventListener(type, callback, options);
+}
+
+function invalidKey(hotkey: string): never {
+    throw new Error(`Invalid hotkey: '${hotkey}'`);
+}
