@@ -70,14 +70,12 @@ export function registerHotkey(
         .join("+"));
 
     return listen(target, eventName, function (this: EventTarget, e: KeyboardEvent) {
-        if ((e.target as HTMLElement)?.closest("[data-hotkey-ignore]")) {
-            return;
-        }
-
-        const code = e.code.toUpperCase();
-
-        if (info.code === code && controlKeys.every(n => info[n as keyof Hotkey] === e[n as keyof KeyboardEvent])) {
-            handler.call(this, e);
+        if (!(e.target as HTMLElement)?.closest("[data-hotkey-ignore]")) {
+            if (info.code === e.code.toUpperCase()) {
+                if (controlKeys.every(n => info[n as keyof Hotkey] === e[n as keyof KeyboardEvent])) {
+                    handler.call(this, e);
+                }
+            }
         }
     } as EventListener, options);
 }
