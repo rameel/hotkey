@@ -1,5 +1,5 @@
 {
-  "name": "hotkey",
+  "name": "@ramstack/hotkey",
   "version": "1.0.0",
   "description": "A lightweight Javascript library for handling hotkeys. Has no dependencies.",
   "type": "module",
