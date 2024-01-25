@@ -47,7 +47,7 @@ interface Hotkey {
 /**
  * Registers a hotkey on the specified target element.
  *
- * @param {EventTarget} target - The target element on which the hotkey will be registered.
+ * @param {EventTarget | string} target - The target element on which the hotkey will be registered.
  * @param {string} hotkey - The combination of keys for the hotkey, e.g., "Ctrl+Alt+Delete".
  * @param {(e: KeyboardEvent) => void} handler - The function to be called when the hotkey is triggered.
  * @param {string} [eventName="keydown"] - The name of the event to listen for (default is "keydown").
@@ -56,7 +56,7 @@ interface Hotkey {
  * @returns {() => void} - A function to unregister the hotkey.
  */
 export function registerHotkey(
-    target: EventTarget,
+    target: EventTarget | string,
     hotkey: string,
     handler: (e: KeyboardEvent) => void,
     eventName: string = "keydown",
@@ -68,6 +68,11 @@ export function registerHotkey(
         .split("+")
         .sort()
         .join("+"));
+
+    if (typeof target === "string") {
+        target = document.querySelector(target)
+            ?? error(`Element with selector '${ target }' not found`);
+    }
 
     return listen(target, eventName, function (this: EventTarget, e: KeyboardEvent) {
         if (!(e.target as HTMLElement)?.closest("[data-hotkey-ignore]")) {
@@ -117,5 +122,9 @@ function listen(target: EventTarget, type: string, callback: EventListener | nul
 }
 
 function invalidKey(hotkey: string): never {
-    throw new Error(`Invalid hotkey: '${hotkey}'`);
+    error(`Invalid hotkey: '${hotkey}'`);
+}
+
+function error(message: string): never {
+    throw new Error(message);
 }
