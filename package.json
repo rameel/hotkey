@@ -5,10 +5,10 @@
   "type": "module",
   "main": "dist/hotkey.esm.js",
   "module": "dist/hotkey.esm.js",
-  "types": "types/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "files": [
     "dist",
-    "types/index.d.ts"
+    "dist/types/index.d.ts"
   ],
   "author": "rameel <rameel-b@hotmail.com>",
   "license": "MIT",
@@ -16,6 +16,10 @@
     "build": "cross-env NODE_ENV=production rollup -c",
     "prebuild": "npm run clean",
     "clean": "rimraf dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rameel/hotkey.git"
   },
   "keywords": [
     "hotkey",
