@@ -65,8 +65,7 @@ export function registerHotkey(
     const info = describe(hotkey);
 
     if (typeof target === "string") {
-        target = document.querySelector(target)
-            ?? error(`Element with selector '${ target }' not found`);
+        target = document.querySelector(target) ?? error(`No element found for selector '${target}'`);
     }
 
     return listen(target, eventName, function (this: EventTarget, e: KeyboardEvent) {
