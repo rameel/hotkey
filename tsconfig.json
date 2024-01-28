@@ -8,6 +8,6 @@
     "declarationDir": "./dist/types"
   },
   "files": [
-    "src/index.ts"
+    "src/hotkey.ts"
   ]
 }

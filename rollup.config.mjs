@@ -35,10 +35,14 @@ const plugins = [
 ];
 
 export default [{
-    input: "src/index.ts",
+    input: "src/hotkey.ts",
     output: [{
         file: "dist/hotkey.esm.js",
         format: "esm"
+    },{
+        file: "dist/hotkey.esm.min.js",
+        format: "esm",
+        plugins: [terser(terserOptions)]
     }, {
         name: "window",
         file: "dist/hotkey.js",
