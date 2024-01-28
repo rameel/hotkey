@@ -102,7 +102,7 @@ You can subscribe to events on `keydown` (used by default) or `keyup`.
 
 ```js
 registerHotkey("#el", "Ctrl + K", e => {
-    console.log(e.currentTarget === this); // logs false
+    console.log("Search...");
 }, "keyup");
 ```
 
