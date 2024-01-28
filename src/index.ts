@@ -62,12 +62,7 @@ export function registerHotkey(
     eventName: string = "keydown",
     options?: AddEventListenerOptions | boolean | undefined): () => void {
 
-    const info = describe(hotkey
-        .replace(/\s+/g, "")
-        .toLowerCase()
-        .split("+")
-        .sort()
-        .join("+"));
+    const info = describe(hotkey);
 
     if (typeof target === "string") {
         target = document.querySelector(target)
@@ -86,7 +81,8 @@ export function registerHotkey(
 }
 
 function describe(hotkey: string): Hotkey {
-    const info = hotkey.split("+").reduce((data, k) => {
+    const keys = hotkey.replace(/\s+/g, "").toLowerCase().split("+");
+    const info = keys.reduce((data, k) => {
         k = aliases[k] ?? k;
         switch (k) {
             case "ctrl":
