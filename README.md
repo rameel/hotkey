@@ -5,9 +5,22 @@ The library weighs around 1.32KB and approximately 750 bytes when gzipped.
 
 ## Installation
 
-### Via NPM
-```cmd
+### Using via NPM
+```sh
 npm install --save @ramstack/hotkey
+```
+
+### Using via CDN
+```html
+<script src="https://cdn.jsdelivr.net/npm/@ramstack/hotkey@1/dist/hotkey.min.js"></script>
+```
+
+### Using ES module build
+
+```html
+<script type="module">
+  import { registerHotkey } from "https://cdn.jsdelivr.net/npm/@ramstack/hotkey@1/dist/hotkey.esm.min.js";
+</script>
 ```
 
 ## Quick start
@@ -15,23 +28,70 @@ You can specify either the element itself or its selector as the target for key 
 For global listening across the entire page, use `window` or `document`.
 
 ```js
-const cleanup = registerHotkey("#app", "Ctrl + K", e => {
-    console.log("Search...");
+registerHotkey("#app", "Ctrl + K", e => {
+  e.preventDefault();
+  console.log("Search...");
 });
-
-// Unregister the hotkeys when they are no longer needed
-cleanup();
 ```
 The function returns a cleanup function that allows you to unsubscribe from event listening.
 
+```js
+const cleanup = registerHotkey(...);
+...
+
+// Unregister the hotkey when they are no longer needed
+cleanup();
+```
+
+### Exclude elements from hotkey handling
+
+If you wish to prevent hotkey handling on certain elements, add the `data-hotkey-ignore` attribute
+to the respective element.
+```html
+<div id="app">
+    ...
+    <!-- Ignoring hotkeys on the input element -->
+    <input type="text" data-hotkey-ignore>
+</div>
+```
+
+Alternatively, apply it to the parent if you want to exclude
+an entire group of elements at once.
+```html
+<div id="app">
+    ...
+    <!-- Ignoring hotkeys on form elements -->
+    <form data-hotkey-ignore>
+        ...
+    </form>
+</div>
+```
+
 ## API
 
-`registerHotkey(target, hotkey, handler, eventName = 'keydown', options?)`
-
+```ts
+/**
+ * Registers a hotkey on the specified target element.
+ *
+ * @param {EventTarget | string} target - The target element on which the hotkey will be registered.
+ * @param {string} hotkey - The combination of keys for the hotkey, e.g., "Ctrl+Alt+Delete".
+ * @param {(e: KeyboardEvent) => void} handler - The function to be called when the hotkey is triggered.
+ * @param {string} [eventName="keydown"] - The name of the event to listen for (default is "keydown").
+ * @param {AddEventListenerOptions | boolean | undefined} [options] - Additional options for the event listener.
+ *
+ * @returns {() => void} - A function to unregister the hotkey.
+ */
+function registerHotkey(
+    target: EventTarget | string,
+    hotkey: string,
+    handler: (e: KeyboardEvent) => void,
+    eventName?: string,
+    options?: AddEventListenerOptions | boolean | undefined): () => void;
+```
 **Parameters**
 
 #### target (required)
-The target element on which the hotkey will be registered. Use `window` for global hotkeys.
+The target element on which the hotkey will be registered. Use `window` or `document` for global hotkeys.
 ```js
 registerHotkey(window, "Win + PgUp", e => {
     console.log("Do something");
@@ -101,8 +161,9 @@ The name of the event to listen for.
 You can subscribe to events on `keydown` (used by default) or `keyup`.
 
 ```js
-registerHotkey("#el", "Ctrl + K", e => {
-    console.log("Search...");
+registerHotkey(window, "Ctrl + Up", e => {
+    e.preventDefault();
+    ...
 }, "keyup");
 ```
 
@@ -113,11 +174,10 @@ Additional options for the event listener. See [Options](https://developer.mozil
 A function that, when called, unregisters the hotkey.
 
 ```js
-const cleanup = registerHotkey("#app", "Ctrl + K", e => {
-    console.log("Search...");
-});
+const cleanup = registerHotkey(...);
+...
 
-// Unregister the hotkeys when they are no longer needed
+// Unregister the hotkey when they are no longer needed
 cleanup();
 ```
 
